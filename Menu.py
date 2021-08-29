@@ -3,12 +3,15 @@ from tkinter.filedialog import askopenfilename
 from xml.dom import minidom
 from xml.etree import ElementTree as ET 
 from LinkedList import LinkedList
+import graphviz
 Lista = LinkedList()
 Lista_new = LinkedList()
 ListaX = LinkedList()
 ListaY = LinkedList()
 X_new = LinkedList()
 Y_new = LinkedList()
+d = graphviz.Digraph(filename='matriz')
+counter_mx = 0
 
 def Menu():
     op = 0
@@ -46,7 +49,6 @@ def Menu():
                     ListaX.Insert(posicion.attrib['x'])
                     ListaY.Insert(posicion.attrib['y'])
              
-
         
             def procesar_terreno(nombre):
                 node = Lista.First
@@ -93,6 +95,19 @@ def Menu():
                         data = data.Next         
                         
                 return(array)
+        
+            def matrix_aux():
+                contador = 0
+                x = Size()[0]
+                y = Size()[1]
+                array = [[0]*x for i in range(y)]
+
+                for n in range(y):
+                    for m in range(x):
+                        array[n][m] = contador
+                        contador +=1
+                print(contador)
+                return(array)
 
         elif op==2:
             print("Ingrese el nombre del terreno")
@@ -112,6 +127,52 @@ def Menu():
         
         elif op==5:
             print("Generar Grafica")
+           
+
+#Matriz de ejemplo
+            matriz = matrix()
+
+            def declararNodos(listaFila):#Aca se definen las filas al mismo nivel
+                global d    
+                global counter_mx 
+                with d.subgraph() as s:
+                    s.attr(rank='same')        
+                    for i in listaFila:
+                        s.node(str(counter_mx), str(i))
+                        counter_mx+=1
+
+            def apuntarNodosHorizontales(lista):#Aca se apuntan los nodos de cada fila
+                global d
+                contador = 0
+                for i in lista:
+                    if contador <= len(lista) and contador >= 1:
+                        d.edge(str(lista[contador - 1]), str(lista[contador]))
+                    contador += 1    
+
+            def apuntarNodosVerticales(matriz):#Aca se apuntan los nodos de cada columna
+                contador1 = 0
+                for i in matriz:
+                    contador2 = 0
+                    for j in i:
+                        if (contador2 < len(i) and contador2 >= 1 ):
+                            if(contador2 == 1) and contador1 < len(matriz) - 1:
+                                d.edge(str(i[contador2-1]), str(matriz[contador1 + 1][contador2-1]))
+                            if contador1 < len(matriz) - 1:
+                                d.edge(str(i[contador2]), str(matriz[contador1 + 1][contador2]))
+                        contador2 += 1
+                    contador1 += 1
+
+            for i in matriz:
+                declararNodos(i)
+
+            for i in matrix_aux():
+                apuntarNodosHorizontales(i)
+
+            apuntarNodosVerticales(matrix_aux())
+
+            d.view()
+            d.clear()
+            
         
         elif op==6:
             print("Adios")
