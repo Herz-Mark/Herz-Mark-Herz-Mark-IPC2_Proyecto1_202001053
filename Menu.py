@@ -1,6 +1,5 @@
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from xml.dom import minidom
 from xml.etree import ElementTree as ET 
 from LinkedList import LinkedList
 import graphviz
